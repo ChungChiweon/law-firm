@@ -178,6 +178,7 @@ docs/
 
 | 문서 | 용도 |
 |------|------|
+| [`docs/supabase-setup-guide.md`](docs/supabase-setup-guide.md) | **Supabase 연결 가이드** (프로젝트 생성 → SQL → 환경변수 → 테스트) |
 | [`docs/final-launch-report.md`](docs/final-launch-report.md) | **최종 Launch 보고서** (완성 기능·배포 순서·판정) |
 | [`docs/github-upload-guide.md`](docs/github-upload-guide.md) | **GitHub 업로드 가이드** (저장소 생성 → 명령어 → 업로드 후 확인) |
 | [`docs/vercel-env-checklist.md`](docs/vercel-env-checklist.md) | **Vercel 환경변수 체크리스트** (필수·권장·선택 변수 설명) |

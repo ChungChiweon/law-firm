@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           message:
-            "저장 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요.",
+            "일시적으로 접수가 원활하지 않습니다. 카카오톡 상담을 이용해 주시거나 전화로 문의해 주세요.",
         },
         { status: 500 }
       );
@@ -167,7 +167,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: "서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        message:
+          "일시적으로 접수가 원활하지 않습니다. 카카오톡 상담을 이용해 주시거나 전화로 문의해 주세요.",
       },
       { status: 500 }
     );

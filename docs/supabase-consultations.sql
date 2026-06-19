@@ -53,7 +53,7 @@ ALTER TABLE consultations
 ALTER TABLE consultations
   ADD CONSTRAINT chk_area CHECK (
     area IN (
-      'dating_violence', 'stalking', 'sexual_assault',
+      'sexual_crime', 'dating_violence', 'stalking',
       'digital_sex', 'telecom_sex', 'camera_crime',
       'domestic_violence', 'workplace_sex', 'other'
     )
@@ -63,7 +63,7 @@ ALTER TABLE consultations
 -- ALTER TABLE consultations DROP CONSTRAINT IF EXISTS chk_area;
 -- ALTER TABLE consultations ADD CONSTRAINT chk_area CHECK (
 --   area IN (
---     'dating_violence', 'stalking', 'sexual_assault',
+--     'sexual_crime', 'dating_violence', 'stalking',
 --     'digital_sex', 'telecom_sex', 'camera_crime',
 --     'domestic_violence', 'workplace_sex', 'other'
 --   )
@@ -86,7 +86,7 @@ CREATE POLICY "anon_insert_consultations"
 
 -- 6. 컬럼 설명 (선택)
 COMMENT ON TABLE  consultations               IS '법률 상담 신청 접수 데이터';
-COMMENT ON COLUMN consultations.area          IS '상담 분야: dating_violence|stalking|sexual_assault|digital_sex|telecom_sex|camera_crime|domestic_violence|workplace_sex|other';
+COMMENT ON COLUMN consultations.area          IS '상담 분야: sexual_crime|dating_violence|stalking|digital_sex|telecom_sex|camera_crime|domestic_violence|workplace_sex|other';
 COMMENT ON COLUMN consultations.opponent_type IS '상대방 유형: family|individual|company|landlord|other';
 COMMENT ON COLUMN consultations.contact_time  IS '연락 가능 시간: morning|afternoon|evening|anytime';
 COMMENT ON COLUMN consultations.status        IS '처리 상태: new|contacted|reviewing|retained|closed';

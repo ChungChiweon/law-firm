@@ -3,9 +3,13 @@ import { createClient } from "@supabase/supabase-js";
 import type { ConsultationStatus, AdminConsultationUpdate } from "@/lib/supabase/types";
 
 // ── 공통: 서버 Supabase 클라이언트 ──────────────────
+// SUPABASE_SERVICE_ROLE_KEY 설정 시 RLS를 우회하여 관리자 조회/수정 가능
+// 미설정 시 anon key 사용 → RLS INSERT 전용 정책으로 인해 GET/PATCH 실패
 function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey   = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key = serviceKey ?? anonKey;
   if (!url || !key) throw new Error("Supabase 환경변수 누락");
   return createClient(url, key);
 }
