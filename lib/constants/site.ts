@@ -20,7 +20,7 @@ export const SITE_CONFIG = {
   // ★ 의뢰인 확인 필요: 사무소 실제 소개 문구로 교체 권장
 
   // ── 도메인 및 OG ──────────────────────────────────────────
-  url:     "https://law-firm.kr",   // ★ 실제 도메인으로 교체
+  url:     "https://law-firm-chi-ten.vercel.app", // Vercel 배포 URL
   ogImage: "/images/og-image.png",  // ★ public/images/og-image.png 파일 추가 필요
 
   // ── 연락처 ────────────────────────────────────────────────
