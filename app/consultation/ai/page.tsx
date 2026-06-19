@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, Bot } from "lucide-react";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { AiConsultationChat } from "@/components/ai-consultation/AiConsultationChat";
 import { SITE_CONFIG } from "@/lib/constants/site";
 
@@ -14,8 +13,7 @@ export const metadata: Metadata = {
 
 export default function AiConsultationPage() {
   return (
-    <>
-      <Header />
+    <PublicLayout>
       <main className="min-h-screen bg-slate-50">
         <AiHero />
         <div className="mx-auto max-w-2xl px-4 pb-20 pt-8 sm:px-6">
@@ -63,8 +61,7 @@ export default function AiConsultationPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+    </PublicLayout>
   );
 }
 

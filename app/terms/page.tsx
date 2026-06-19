@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { LegalPageLayout } from "@/components/legal/LegalPageLayout";
 import { LegalSection, LegalList, LegalParagraph, LegalSubTitle } from "@/components/legal/LegalSection";
 import { SITE_CONFIG } from "@/lib/constants/site";
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
+    <PublicLayout>
     <LegalPageLayout
       eyebrow="Terms of Service"
       title="이용약관"
@@ -88,5 +90,6 @@ export default function TermsPage() {
         </LegalParagraph>
       </LegalSection>
     </LegalPageLayout>
+    </PublicLayout>
   );
 }

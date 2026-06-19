@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { ChevronRight, Bot } from "lucide-react";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ConsultationForm } from "@/components/consultation/ConsultationForm";
 import { ConsultationGuide } from "@/components/consultation/ConsultationGuide";
 import { SITE_CONFIG } from "@/lib/constants/site";
@@ -16,45 +15,43 @@ export const metadata: Metadata = {
 
 export default function ConsultationPage() {
   return (
-    <>
-      <Header />
+    <PublicLayout>
       <main className="min-h-screen bg-slate-50">
         <ConsultationHero />
 
         {/* 본문 그리드 */}
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8 lg:pb-24">
-          <div className="grid gap-8 lg:grid-cols-[1fr_340px] lg:items-start xl:grid-cols-[1fr_360px]">
-                {/* AI 상담 정리 배너 */}
-            <AiConsultationBanner />
+        <div className="mx-auto max-w-6xl px-4 pb-16 pt-5 sm:px-6 sm:pb-20 sm:pt-6 lg:px-8 lg:pb-24">
+          <div className="grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start xl:grid-cols-[1fr_360px]">
+            {/* 왼쪽 컬럼: AI 배너 + 폼 */}
+            <div className="flex flex-col gap-4">
+              <AiConsultationBanner />
+              <Suspense fallback={<FormSkeleton />}>
+                <ConsultationForm />
+              </Suspense>
+            </div>
 
-            {/* 폼 — useSearchParams 사용으로 Suspense 필요 */}
-            <Suspense fallback={<FormSkeleton />}>
-              <ConsultationForm />
-            </Suspense>
-
-            {/* 사이드 가이드 */}
+            {/* 오른쪽 컬럼: 사이드 가이드 */}
             <ConsultationGuide />
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+    </PublicLayout>
   );
 }
 
 // ── Hero 영역 ────────────────────────────────────────
 function ConsultationHero() {
   return (
-    <div className="relative overflow-hidden bg-[#060f1e] pt-16">
+    <div className="relative overflow-hidden bg-[#060f1e] pt-16 sm:pt-16">
       {/* 상단 골드 라인 */}
       <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-amber-500/60 to-transparent" />
 
       {/* 배경 그라디언트 */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,#0f2a50,transparent)]" />
 
-      <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+      <div className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         {/* 브레드크럼 */}
-        <nav aria-label="breadcrumb" className="mb-5 flex items-center gap-1.5 text-[0.75rem] text-slate-500">
+        <nav aria-label="breadcrumb" className="mb-3 flex items-center gap-1.5 text-[0.75rem] text-slate-500">
           <Link href="/" className="transition-colors hover:text-amber-400">홈</Link>
           <ChevronRight size={12} className="text-slate-700" />
           <span className="text-slate-400">상담 신청</span>
@@ -89,7 +86,7 @@ function ConsultationHero() {
         </div>
 
         {/* 하단 장식선 */}
-        <div className="mt-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="mt-5 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       </div>
     </div>
   );
@@ -100,7 +97,7 @@ function AiConsultationBanner() {
   return (
     <Link
       href="/consultation/ai"
-      className="group mb-2 flex items-center gap-4 rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-5 py-4 transition-all hover:border-amber-400 hover:shadow-[0_4px_20px_rgba(245,158,11,0.15)]"
+      className="group flex items-center gap-4 rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-5 py-4 transition-all hover:border-amber-400 hover:shadow-[0_4px_20px_rgba(245,158,11,0.15)]"
     >
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 transition group-hover:bg-amber-500/20">
         <Bot size={20} className="text-amber-600" />

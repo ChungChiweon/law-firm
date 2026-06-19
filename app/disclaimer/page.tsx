@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { LegalPageLayout } from "@/components/legal/LegalPageLayout";
 import { LegalSection, LegalList, LegalParagraph } from "@/components/legal/LegalSection";
 import { SITE_CONFIG } from "@/lib/constants/site";
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 
 export default function DisclaimerPage() {
   return (
+    <PublicLayout>
     <LegalPageLayout
       eyebrow="Legal Disclaimer"
       title="면책사항"
@@ -81,5 +83,6 @@ export default function DisclaimerPage() {
         ]} />
       </LegalSection>
     </LegalPageLayout>
+    </PublicLayout>
   );
 }

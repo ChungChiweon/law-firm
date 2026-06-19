@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Mail, Clock, MapPin, ArrowRight, Bot, Lock } from "lucide-react";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 import { SITE_CONFIG } from "@/lib/constants/site";
 
 export const metadata: Metadata = {
@@ -12,8 +11,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <>
-      <Header />
+    <PublicLayout>
       <main className="min-h-screen bg-slate-50">
         <ContactHero />
         <div className="mx-auto max-w-3xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 lg:px-8">
@@ -32,8 +30,7 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+    </PublicLayout>
   );
 }
 

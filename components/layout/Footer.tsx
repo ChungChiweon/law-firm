@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, ShieldCheck } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants/site";
 
 const QUICK_LINKS = [
   { label: "비공개 상담 신청", href: SITE_CONFIG.contact.consultationUrl },
   { label: "AI 상담 정리", href: "/consultation/ai" },
-  { label: "상담 가능 분야", href: "/#practice-areas" },
-  { label: "변호사 소개", href: "/#lawyer" },
+  { label: "상담 분야", href: "/practice-areas" },
+  { label: "상담 절차", href: "/process" },
+  { label: "변호사 소개", href: "/lawyer" },
+  { label: "자주 묻는 질문", href: "/faq" },
   { label: "문의", href: "/contact" },
 ];
 
@@ -34,19 +36,13 @@ export function Footer() {
             <div className="lg:col-span-4">
               {/* 로고 */}
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path
-                      d="M12 3L4 7v5c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V7L12 3z"
-                      fill="#f59e0b"
-                      opacity="0.9"
-                    />
-                  </svg>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+                  <ShieldCheck size={20} strokeWidth={2} className="text-amber-400" />
                 </div>
                 <div>
-                  <p className="text-base font-bold text-white">{SITE_CONFIG.name}</p>
-                  <p className="text-[0.6rem] font-semibold tracking-[0.1em] text-amber-500/70">
-                    데이트폭력·스토킹 피해 상담
+                  <p className="text-[1rem] font-extrabold text-white">{SITE_CONFIG.name}</p>
+                  <p className="text-[0.6rem] font-semibold tracking-[0.08em] text-amber-500/70">
+                    데이트폭력 · 스토킹 피해 상담
                   </p>
                 </div>
               </div>

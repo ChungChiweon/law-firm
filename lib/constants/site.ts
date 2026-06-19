@@ -55,10 +55,10 @@ export const SITE_CONFIG = {
 
 } as const;
 
-// 하위 페이지에서도 홈 섹션으로 이동하도록 /# 형식 사용
 export const NAV_ITEMS = [
-  { label: "상담 분야", href: "/#practice-areas" },
-  { label: "상담 절차", href: "/#process" },
-  { label: "변호사 소개", href: "/#lawyer" },
-  { label: "자주 묻는 질문", href: "/#faq" },
+  { label: "홈", href: "/" },
+  { label: "상담 분야", href: "/practice-areas" },
+  { label: "상담 절차", href: "/process" },
+  { label: "변호사 소개", href: "/lawyer" },
+  { label: "자주 묻는 질문", href: "/faq" },
 ] as const;

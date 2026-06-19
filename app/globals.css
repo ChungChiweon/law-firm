@@ -142,3 +142,48 @@
   content: "";
   @apply absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent;
 }
+
+/* ════════════════════════════════════
+   HERO — 새벽의 조용한 상담실
+   창문 채광 / 책상 램프 / 먼지 입자 / 공간감
+   ════════════════════════════════════ */
+
+/* 창문 새벽빛 — 아주 천천히 밝아졌다 어두워짐 */
+@keyframes consultation-window {
+  0%,  100% { opacity: 0.78; transform: translate(0px,  0px)  scale(1);    }
+  38%        { opacity: 1.00; transform: translate(-10px, 7px) scale(1.04); }
+  72%        { opacity: 0.60; transform: translate(6px,  -5px) scale(0.97); }
+}
+
+/* 책상 램프 온기 — 미세하게 숨쉬기 */
+@keyframes consultation-lamp {
+  0%,  100% { opacity: 0.72; transform: scale(1);    }
+  50%        { opacity: 0.95; transform: scale(1.09); }
+}
+
+/* 먼지 입자 — 빛 속 미세 입자 떠오름 */
+@keyframes dust-float {
+  0%   { transform: translateY(0px)   translateX(0px);   opacity: 0;    }
+  12%  { opacity: 0.55; }
+  88%  { opacity: 0.55; }
+  100% { transform: translateY(-90px) translateX(14px);  opacity: 0;    }
+}
+
+/* 카드 floating */
+@keyframes warm-float {
+  0%,  100% { transform: translateY(0px);  }
+  50%        { transform: translateY(-4px); }
+}
+
+/* ─── 클래스 ─── */
+.animate-window-light { animation: consultation-window 55s ease-in-out infinite;     }
+.animate-lamp-glow    { animation: consultation-lamp   42s ease-in-out infinite  5s; }
+.animate-dust         { animation: dust-float          15s ease-in-out infinite;     }
+.animate-warm-float   { animation: warm-float           8s ease-in-out infinite;     }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-window-light,
+  .animate-lamp-glow,
+  .animate-dust,
+  .animate-warm-float { animation: none !important; }
+}
