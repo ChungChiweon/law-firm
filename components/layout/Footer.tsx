@@ -133,7 +133,7 @@ export function Footer() {
         {/* 하단 바 */}
         <div className="flex flex-col gap-3 border-t border-white/[0.07] py-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-4">
-            <p className="text-[0.75rem] text-slate-600">
+            <p className="text-[0.75rem] text-slate-300">
               © {currentYear} {SITE_CONFIG.name}. All rights reserved.
             </p>
             <div className="flex gap-3">
@@ -141,14 +141,14 @@ export function Footer() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-[0.75rem] text-slate-600 transition-colors hover:text-slate-400"
+                  className="text-[0.75rem] text-slate-300 transition-colors hover:text-white"
                 >
                   {item.label}
                 </Link>
               ))}
             </div>
           </div>
-          <p className="text-[0.6875rem] text-slate-700">
+          <p className="text-[0.6875rem] text-slate-400">
             본 사이트는 법률 정보 제공 목적이며, 법률 조언으로 갈음할 수 없습니다.
           </p>
         </div>

@@ -175,15 +175,23 @@
   50%        { transform: translateY(-4px); }
 }
 
+/* 햇빛 스윕 — 좌→우 한 번만 통과 */
+@keyframes sun-sweep {
+  0%   { transform: translateX(0);       }
+  100% { transform: translateX(-400vw);  }
+}
+
 /* ─── 클래스 ─── */
 .animate-window-light { animation: consultation-window 55s ease-in-out infinite;     }
 .animate-lamp-glow    { animation: consultation-lamp   42s ease-in-out infinite  5s; }
 .animate-dust         { animation: dust-float          15s ease-in-out infinite;     }
 .animate-warm-float   { animation: warm-float           8s ease-in-out infinite;     }
+.animate-sun-sweep    { animation: sun-sweep 9.6s cubic-bezier(0.25,0.1,0.25,1) 6.0s 1 forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-window-light,
   .animate-lamp-glow,
   .animate-dust,
-  .animate-warm-float { animation: none !important; }
+  .animate-warm-float,
+  .animate-sun-sweep { animation: none !important; }
 }

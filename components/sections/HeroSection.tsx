@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Lock, ShieldCheck } from "lucide-react";
 import { SITE_CONFIG } from "@/lib/constants/site";
+import { SunSweep } from "@/components/sections/SunSweep";
 
 export function HeroSection() {
   return (
@@ -17,6 +18,9 @@ export function HeroSection() {
           backgroundRepeat: "no-repeat",
         }}
       />
+
+      {/* 햇빛 스윕 */}
+      <SunSweep />
 
       {/* 왼쪽 텍스트 가독성 — 어두운 오버레이 */}
       <div

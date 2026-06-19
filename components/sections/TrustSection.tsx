@@ -41,7 +41,7 @@ function TrustCard({ point, index }: { point: TrustPoint; index: number }) {
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#0a1628] to-[#1a3a6b] shadow-[0_4px_12px_rgba(10,22,40,0.25)] transition-transform duration-300 group-hover:scale-105">
           <Icon size={22} className="text-amber-400" strokeWidth={1.5} />
         </div>
-        <span className="text-3xl font-black text-slate-100 select-none">
+        <span className="text-3xl font-black text-slate-300 select-none">
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>

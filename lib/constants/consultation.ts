@@ -10,10 +10,10 @@ export const CONSULTATION_AREAS: SelectOption<ConsultationArea>[] = [
   { value: "dating_violence",   label: "데이트폭력 피해" },
   { value: "stalking",          label: "스토킹 피해" },
   { value: "digital_sex",       label: "디지털 성범죄 피해" },
-  { value: "camera_crime",      label: "카메라등이용촬영 피해" },
-  { value: "telecom_sex",       label: "통신매체이용음란 피해" },
-  { value: "workplace_sex",     label: "직장·학교 성희롱·성비위" },
-  { value: "domestic_violence", label: "가정폭력·관계폭력 피해" },
+  { value: "camera_crime",      label: "불법촬영 피해" },
+  { value: "telecom_sex",       label: "통신매체이용음란" },
+  { value: "workplace_sex",     label: "직장·학교 성희롱" },
+  { value: "domestic_violence", label: "가정·관계폭력 피해" },
   { value: "other",             label: "기타" },
 ];
 
