@@ -11,6 +11,13 @@ export type ConsultationStatus =
 
 export type ConsultationSource = "landing" | "kakao" | "phone" | "referral";
 
+// 첨부 파일 메타데이터 (원본은 Supabase Storage 비공개 버킷에 보관, DB엔 경로만)
+export interface ConsultationAttachment {
+  path: string;  // 버킷 내 저장 경로
+  name: string;  // 원본 파일명
+  size: number;  // 바이트
+}
+
 export interface ConsultationRow {
   id: string;
   name: string;
@@ -20,7 +27,9 @@ export interface ConsultationRow {
   opponent_type: string | null;
   content: string;
   contact_time: string | null;
+  preferred_at: string | null;   // 희망 상담 일시 (ISO, 예약 시)
   privacy_agreed: boolean;
+  attachments: ConsultationAttachment[] | null;
   status: ConsultationStatus;
   source: ConsultationSource;
   memo: string | null;        // 내부 메모 (관리자용)
@@ -44,7 +53,9 @@ export interface ConsultationInsert {
   opponent_type?: string | null;
   content: string;
   contact_time?: string | null;
+  preferred_at?: string | null;
   privacy_agreed: boolean;
+  attachments?: ConsultationAttachment[];
   status?: ConsultationStatus;
   source?: ConsultationSource;
 }

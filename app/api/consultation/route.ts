@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import type { ConsultationInsert } from "@/lib/supabase/types";
+import type { ConsultationInsert, ConsultationAttachment } from "@/lib/supabase/types";
+import { notifyNewConsultation } from "@/lib/notify";
+import { MAX_FILES } from "@/lib/constants/upload";
 
 // ── 서버 전용 Supabase 클라이언트 ───────────────────
 // API Route는 서버에서만 실행되므로 직접 생성
@@ -96,6 +98,31 @@ function validatePayload(body: unknown): ValidationResult {
   return { ok: true };
 }
 
+// ── 첨부 파일 목록 정제 ──────────────────────────────
+// 클라이언트가 보낸 attachments를 신뢰하지 않고 형식만 통과시킵니다.
+// (실제 파일은 업로드 API가 이미 검증·저장한 뒤 경로만 전달됨)
+function sanitizeAttachments(raw: unknown): ConsultationAttachment[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ConsultationAttachment[] = [];
+  for (const item of raw.slice(0, MAX_FILES)) {
+    if (
+      item &&
+      typeof item === "object" &&
+      typeof (item as Record<string, unknown>).path === "string" &&
+      typeof (item as Record<string, unknown>).name === "string" &&
+      typeof (item as Record<string, unknown>).size === "number"
+    ) {
+      const a = item as Record<string, unknown>;
+      out.push({
+        path: (a.path as string).slice(0, 300),
+        name: (a.name as string).slice(0, 200),
+        size: a.size as number,
+      });
+    }
+  }
+  return out;
+}
+
 // ── POST /api/consultation ───────────────────────────
 export async function POST(request: NextRequest) {
   // Content-Type 확인
@@ -128,6 +155,16 @@ export async function POST(request: NextRequest) {
   }
 
   const data = body as Record<string, unknown>;
+  const attachments = sanitizeAttachments(data.attachments);
+
+  // 희망 상담 일시: 유효한 ISO이고 과거가 아닌 경우만 저장
+  let preferredAt: string | null = null;
+  if (typeof data.preferredAt === "string" && data.preferredAt) {
+    const t = Date.parse(data.preferredAt);
+    if (!Number.isNaN(t) && t > Date.now() - 3600_000) {
+      preferredAt = new Date(t).toISOString();
+    }
+  }
 
   // Supabase insert 페이로드 구성
   const insertPayload: ConsultationInsert = {
@@ -138,7 +175,9 @@ export async function POST(request: NextRequest) {
     opponent_type: data.opponentType ? (data.opponentType as string) : null,
     content: (data.content as string).trim(),
     contact_time: data.contactTime ? (data.contactTime as string) : null,
+    preferred_at: preferredAt,
     privacy_agreed: true,
+    attachments,
     status: "new",
     source: "landing",
   };
@@ -172,6 +211,23 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
+  }
+
+  // ── 접수 알림 (변호사에게 즉시 통지) ──────────────────
+  // 알림 실패가 접수 성공을 막지 않도록 방어적으로 처리합니다.
+  try {
+    await notifyNewConsultation({
+      name: insertPayload.name,
+      phone: insertPayload.phone,
+      area: insertPayload.area,
+      region: insertPayload.region,
+      contactTime: insertPayload.contact_time,
+      preferredAt: insertPayload.preferred_at,
+      content: insertPayload.content,
+      attachmentCount: attachments.length,
+    });
+  } catch (err) {
+    console.error("[Consultation API] 알림 발송 예외:", err);
   }
 
   return NextResponse.json(

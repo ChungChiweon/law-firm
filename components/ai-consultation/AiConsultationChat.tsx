@@ -20,10 +20,17 @@ interface CompletedQA {
   displayAnswer: string;
 }
 
-// ── 헬퍼: chips 선택값 → 한글 레이블 ─────────────────
+// ── 헬퍼: chips/chips-multi 선택값 → 한글 레이블 ──────
 function getDisplayAnswer(questionKey: string, value: string, type: string): string {
   if (type === "chips") {
     return AI_QUESTION_LABEL_MAP[questionKey]?.[value] ?? value;
+  }
+  if (type === "chips-multi") {
+    const map = AI_QUESTION_LABEL_MAP[questionKey] ?? {};
+    return value
+      .split(",")
+      .map((v) => map[v.trim()] ?? v.trim())
+      .join(", ");
   }
   return value;
 }
@@ -75,6 +82,12 @@ export function AiConsultationChat() {
     setSummaryError("");
     const labelOf = (key: string) =>
       AI_QUESTION_LABEL_MAP[key]?.[fa[key]] ?? fa[key] ?? "";
+    const multiLabelOf = (key: string) =>
+      (fa[key] ?? "")
+        .split(",")
+        .map((v) => AI_QUESTION_LABEL_MAP[key]?.[v.trim()] ?? v.trim())
+        .filter(Boolean)
+        .join(", ");
 
     try {
       const res  = await fetch("/api/ai/summary", {
@@ -83,8 +96,10 @@ export function AiConsultationChat() {
         body: JSON.stringify({
           area:      fa["area"] ?? "other",
           region:    "",
-          opponent:  `걱정 사항: ${labelOf("concern")}`,
-          amount:    `진행 단계: ${labelOf("stage")} / 증거: ${labelOf("evidence")}`,
+          role:      labelOf("role"),
+          urgency:   labelOf("urgency"),
+          opponent:  `입장: ${labelOf("role")} / 걱정 사항: ${multiLabelOf("concerns")}`,
+          amount:    `진행 단계: ${labelOf("stage")}`,
           situation: fa["situation"] ?? "",
         }),
       });

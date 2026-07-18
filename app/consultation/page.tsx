@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import { ChevronRight, Bot } from "lucide-react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
@@ -25,9 +24,7 @@ export default function ConsultationPage() {
             {/* 왼쪽 컬럼: AI 배너 + 폼 */}
             <div className="flex flex-col gap-4">
               <AiConsultationBanner />
-              <Suspense fallback={<FormSkeleton />}>
-                <ConsultationForm />
-              </Suspense>
+              <ConsultationForm />
             </div>
 
             {/* 오른쪽 컬럼: 사이드 가이드 */}
@@ -113,22 +110,3 @@ function AiConsultationBanner() {
   );
 }
 
-// ── 로딩 스켈레톤 ──────────────────────────────────
-function FormSkeleton() {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-[0_2px_20px_rgba(0,0,0,0.06)]">
-      <div className="border-b border-slate-100 bg-slate-50 px-6 py-4 sm:px-8">
-        <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
-        <div className="mt-2 h-5 w-40 animate-pulse rounded bg-slate-200" />
-      </div>
-      <div className="space-y-6 px-6 py-7 sm:px-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="space-y-2">
-            <div className="h-3.5 w-20 animate-pulse rounded bg-slate-100" />
-            <div className="h-12 w-full animate-pulse rounded-xl bg-slate-100" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}

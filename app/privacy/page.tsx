@@ -92,7 +92,7 @@ export default function PrivacyPage() {
 
       <LegalSection title="7. 개인정보 보호책임자">
         <LegalList items={[
-          `성명: ${SITE_CONFIG.legalNotice.privacyOfficer} (실제 운영 전 교체 필요)`,
+          `성명: ${SITE_CONFIG.legalNotice.privacyOfficer}`,
           `소속: ${SITE_CONFIG.office.name}`,
           `이메일: ${SITE_CONFIG.contact.email}`,
           `전화: ${SITE_CONFIG.contact.phone}`,

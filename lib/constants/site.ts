@@ -26,31 +26,41 @@ export const SITE_CONFIG = {
   // ── 연락처 ────────────────────────────────────────────────
   // 헤더·푸터·상담폼·완료화면 등 전체 연락처에 반영됩니다.
   contact: {
-    phone:           "02-000-0000",                          // ★ 실제 전화번호로 교체
-    email:           "contact@law-firm.kr",                  // ★ 실제 이메일로 교체
-    address:         "서울특별시 강남구 테헤란로 000, 00빌딩 00층", // ★ 실제 주소로 교체
-    kakaoChannelUrl: "https://pf.kakao.com/_your_channel",   // ★ 실제 카카오채널 URL로 교체
+    phone:           "02-000-0000",                          // ★ 실제 전화번호로 교체 (미확인)
+    email:           "contact@law-firm.kr",                  // ★ 실제 이메일로 교체 (미확인)
+    address:         "서울 서초구 서초대로42길 41 안화빌딩 6층",   // 법무법인 온담 (공개정보)
+    kakaoChannelUrl: "https://pf.kakao.com/_yQlxeb",         // 실제 카카오채널 연결됨
     consultationUrl: "/consultation",                         // 변경 불필요
   },
 
   // ── 상담 가능 시간 ────────────────────────────────────────
   businessHours: "평일 09:00 – 18:00 (주말·공휴일 휴무)", // ★ 실제 운영시간으로 교체
 
+  // ── 긴급 지원 핫라인 (24시간 공공기관) ────────────────────
+  // 피해자 안전 최우선 — 상담센터 연결 전 먼저 안내되는 공식 창구입니다.
+  // 번호는 공공기관 대표번호이며 임의 변경하지 마세요.
+  emergencyContacts: [
+    { label: "경찰 긴급신고",              tel: "112",          note: "지금 위험할 때" },
+    { label: "여성긴급전화",              tel: "1366",         note: "24시간 · 연중무휴" },
+    { label: "디지털성범죄 피해자지원센터", tel: "02-735-8994",  note: "불법촬영·유포 삭제지원" },
+    { label: "해바라기센터",              tel: "1899-3075",    note: "성폭력 통합지원" },
+  ],
+
   // ── 법률사무소 기본 정보 ──────────────────────────────────
   // lawyers.ts와 함께 수정하세요.
   office: {
-    name:                "○○법률사무소", // ★ 실제 법률사무소명으로 교체
-    representativeName:  "○○○",          // ★ 대표 변호사명으로 교체
-    barNumber:           "제○○○○호",    // ★ 변호사 등록번호로 교체
+    name:                "법무법인 온담",  // 공개정보
+    representativeName:  "정경욱",         // 대표변호사
+    barNumber:           "제○○○○호",     // ★ 변호사 등록번호로 교체 (미확인)
   },
 
   // ── 법적 표시 정보 ────────────────────────────────────────
   // 변호사법·광고 규정에 따른 필수 표시 항목입니다.
   // 법률 전문가와 함께 내용을 확인하세요.
   legalNotice: {
-    barAssociation: "○○지방변호사회",   // ★ 소속 지방변호사회로 교체
-    businessRegNo:  "000-00-00000",      // ★ 사업자등록번호로 교체 (해당 시)
-    privacyOfficer: "○○○",              // ★ 개인정보 보호책임자 성명으로 교체
+    barAssociation: "서울지방변호사회",   // ★ 서초 소재 기준 추정 — 확인 필요
+    businessRegNo:  "000-00-00000",      // ★ 사업자등록번호로 교체 (미확인)
+    privacyOfficer: "정경욱",            // 대표변호사 (개인정보 보호책임자)
   },
 
 } as const;
@@ -59,6 +69,8 @@ export const NAV_ITEMS = [
   { label: "홈", href: "/" },
   { label: "상담 분야", href: "/practice-areas" },
   { label: "상담 절차", href: "/process" },
+  { label: "증거 보전", href: "/evidence-guide" },
+  { label: "법률 칼럼", href: "/columns" },
   { label: "변호사 소개", href: "/lawyer" },
   { label: "자주 묻는 질문", href: "/faq" },
 ] as const;

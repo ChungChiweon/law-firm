@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { X, Phone, MapPin, Clock, FileText, User, Briefcase, Save, Loader2 } from "lucide-react";
+import { X, Phone, MapPin, Clock, FileText, User, Briefcase, Save, Loader2, Paperclip, ExternalLink, CalendarClock } from "lucide-react";
+import { humanSize } from "@/lib/constants/upload";
+import { formatPreferredAt } from "@/lib/booking";
+import type { ConsultationAttachment } from "@/lib/supabase/types";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { STATUS_OPTIONS, AREA_LABEL, OPPONENT_LABEL, CONTACT_TIME_LABEL, SOURCE_LABEL } from "@/lib/constants/admin";
 import { cn } from "@/lib/utils/cn";
@@ -99,6 +102,11 @@ export function AdminConsultationDetail({ item, onClose, onUpdated }: AdminConsu
               <DetailItem icon={Clock} label="연락 가능 시간" value={
                 item.contact_time ? (CONTACT_TIME_LABEL[item.contact_time] ?? item.contact_time) : "—"
               } />
+              <DetailItem icon={CalendarClock} label="희망 상담 일시" value={
+                item.preferred_at ? (
+                  <span className="font-semibold text-amber-700">{formatPreferredAt(item.preferred_at)}</span>
+                ) : "—"
+              } />
               <DetailItem icon={FileText} label="접수 경로" value={
                 SOURCE_LABEL[item.source] ?? item.source
               } />
@@ -115,6 +123,18 @@ export function AdminConsultationDetail({ item, onClose, onUpdated }: AdminConsu
               </p>
             </div>
           </div>
+
+          {/* 첨부 자료 */}
+          {item.attachments && item.attachments.length > 0 && (
+            <div className="border-b border-slate-100 px-5 py-5">
+              <SectionTitle>첨부 자료 ({item.attachments.length})</SectionTitle>
+              <ul className="mt-3 flex flex-col gap-2">
+                {item.attachments.map((a) => (
+                  <AttachmentRow key={a.path} attachment={a} />
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* 상태 변경 */}
           <div className="border-b border-slate-100 px-5 py-5">
@@ -197,6 +217,54 @@ export function AdminConsultationDetail({ item, onClose, onUpdated }: AdminConsu
         </div>
       </div>
     </>
+  );
+}
+
+// 첨부 1건 — 클릭 시 서명 URL을 발급받아 새 탭으로 엽니다.
+function AttachmentRow({ attachment }: { attachment: ConsultationAttachment }) {
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(false);
+
+  const open = async () => {
+    if (loading) return;
+    setLoading(true);
+    setErr(false);
+    try {
+      const res = await fetch("/api/admin/attachment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: attachment.path }),
+      });
+      const json = (await res.json()) as { success: boolean; url?: string };
+      if (!res.ok || !json.success || !json.url) throw new Error();
+      window.open(json.url, "_blank", "noopener,noreferrer");
+    } catch {
+      setErr(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={open}
+        disabled={loading}
+        className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-left transition hover:border-amber-300 hover:bg-amber-50"
+      >
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
+          {loading ? <Loader2 size={15} className="animate-spin" /> : <Paperclip size={15} />}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium text-slate-700">{attachment.name}</span>
+          <span className="text-[0.6875rem] text-slate-400">
+            {err ? <span className="text-red-500">열기 실패 · 다시 시도</span> : humanSize(attachment.size)}
+          </span>
+        </span>
+        <ExternalLink size={14} className="shrink-0 text-slate-400" />
+      </button>
+    </li>
   );
 }
 

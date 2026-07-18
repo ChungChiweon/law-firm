@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS consultations (
   opponent_type  TEXT,
   content        TEXT        NOT NULL,
   contact_time   TEXT,
+  preferred_at   TIMESTAMPTZ,
   privacy_agreed BOOLEAN     NOT NULL DEFAULT false,
+  attachments    JSONB       NOT NULL DEFAULT '[]'::jsonb,
   status         TEXT        NOT NULL DEFAULT 'new',
   source         TEXT        NOT NULL DEFAULT 'landing',
   memo           TEXT,
@@ -97,12 +99,38 @@ COMMENT ON COLUMN consultations.updated_at    IS '최종 수정일시 (트리거
 -- 기존 테이블에 컬럼 추가 (이미 테이블이 있는 경우)
 -- ALTER TABLE consultations ADD COLUMN IF NOT EXISTS memo TEXT;
 -- ALTER TABLE consultations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+-- ALTER TABLE consultations ADD COLUMN IF NOT EXISTS attachments JSONB NOT NULL DEFAULT '[]'::jsonb;
+-- ALTER TABLE consultations ADD COLUMN IF NOT EXISTS preferred_at TIMESTAMPTZ;
 -- ALTER TABLE consultations DROP CONSTRAINT IF EXISTS chk_status;
 -- ALTER TABLE consultations ADD CONSTRAINT chk_status CHECK (
 --   status IN ('new', 'contacted', 'reviewing', 'retained', 'closed')
 -- );
 
 -- ============================================================
+-- 7. 첨부 파일용 Storage 비공개 버킷 + 정책
+-- ------------------------------------------------------------
+-- 상담 신청 시 증거 파일(이미지·PDF)을 비공개로 보관합니다.
+-- 업로드/열람은 서버(service_role)에서만 수행하므로 공개하지 않습니다.
+-- ------------------------------------------------------------
+
+-- 7-1. 비공개 버킷 생성 (public = false)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('consultation-files', 'consultation-files', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- 7-2. (선택) anon 업로드를 서버 프록시 대신 직접 허용하려는 경우에만 사용.
+--      본 프로젝트는 service_role 서버 업로드를 사용하므로 기본은 불필요합니다.
+--      service_role 은 RLS 를 우회하므로 별도 정책 없이 업로드·서명URL 발급이 됩니다.
+--
+-- CREATE POLICY "anon_upload_consultation_files"
+--   ON storage.objects FOR INSERT TO anon
+--   WITH CHECK (bucket_id = 'consultation-files');
+
+-- ⚠️ 주의: SUPABASE_SERVICE_ROLE_KEY 환경변수가 설정되어 있어야
+--          파일 업로드(/api/consultation/upload)와 관리자 열람이 동작합니다.
+
+-- ============================================================
 -- 실행 확인 쿼리
 -- SELECT * FROM consultations ORDER BY created_at DESC LIMIT 10;
+-- SELECT id, public FROM storage.buckets WHERE id = 'consultation-files';
 -- ============================================================

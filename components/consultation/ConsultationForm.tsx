@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 import { CheckCircle2, AlertCircle, ChevronDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import {
   CONSULTATION_AREAS,
   OPPONENT_TYPES,
-  CONTACT_TIMES,
   AREA_QUERY_MAP,
   PRIVACY_POLICY_TEXT,
 } from "@/lib/constants/consultation";
 import type { ConsultationFormData, ConsultationArea } from "@/lib/types";
+import type { ConsultationAttachment } from "@/lib/supabase/types";
+import { AttachmentUploader } from "@/components/consultation/AttachmentUploader";
+import { BookingCalendar, type BookingValue } from "@/components/consultation/BookingCalendar";
+import { buildPreferredAt, toContactTimeBucket } from "@/lib/booking";
 import { SITE_CONFIG } from "@/lib/constants/site";
 
 const SITE_CONFIG_PHONE = SITE_CONFIG.contact.phone;
@@ -30,20 +32,26 @@ const INITIAL_FORM: ConsultationFormData = {
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
 export function ConsultationForm() {
-  const searchParams = useSearchParams();
   const [form, setForm] = useState<ConsultationFormData>(INITIAL_FORM);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [attachments, setAttachments] = useState<ConsultationAttachment[]>([]);
+  const [booking, setBooking] = useState<BookingValue | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof ConsultationFormData, string>>>({});
   const [status, setStatus] = useState<FormStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // URL 쿼리 파라미터로 분야 자동 선택 (초기 마운트 시 한 번만 실행)
+  // 익명일 때 실제로 저장될 이름 ("익명" 또는 입력한 닉네임)
+  const effectiveName = isAnonymous ? form.name.trim() || "익명" : form.name.trim();
+
+  // URL 쿼리 파라미터로 분야 자동 선택 (클라이언트 마운트 시 한 번만 실행)
+  // useSearchParams 대신 window.location으로 읽어 Suspense 경계 dehydration을 방지
   useEffect(() => {
-    const areaParam = searchParams.get("area");
+    const areaParam = new URLSearchParams(window.location.search).get("area");
     if (areaParam && areaParam in AREA_QUERY_MAP) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm((prev) => ({ ...prev, area: AREA_QUERY_MAP[areaParam] as ConsultationArea }));
     }
-  }, [searchParams]);
+  }, []);
 
   const set = <K extends keyof ConsultationFormData>(key: K, value: ConsultationFormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -52,7 +60,7 @@ export function ConsultationForm() {
 
   const validate = (): boolean => {
     const next: typeof errors = {};
-    if (!form.name.trim()) next.name = "이름을 입력해 주세요.";
+    if (!isAnonymous && !form.name.trim()) next.name = "이름을 입력해 주세요.";
     if (!form.phone.trim()) {
       next.phone = "연락처를 입력해 주세요.";
     } else if (!/^[0-9\-\s+()]{7,20}$/.test(form.phone.trim())) {
@@ -84,14 +92,17 @@ export function ConsultationForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name:          form.name,
+          name:          effectiveName,
           phone:         form.phone,
           area:          form.area,
           region:        form.region || null,
           opponentType:  form.opponentType || null,
           content:       form.content,
-          contactTime:   form.contactTime || null,
+          // 예약 슬롯을 선택하면 정확한 희망 일시 + 연락 시간대(파생)를 함께 전송
+          contactTime:   booking ? toContactTimeBucket(Number(booking.time.split(":")[0])) : null,
+          preferredAt:   booking ? buildPreferredAt(booking.date, booking.time) : null,
           privacyAgreed: form.privacyAgreed,
+          attachments,
         }),
       });
 
@@ -116,6 +127,9 @@ export function ConsultationForm() {
 
   const handleReset = () => {
     setForm(INITIAL_FORM);
+    setIsAnonymous(false);
+    setAttachments([]);
+    setBooking(null);
     setErrors({});
     setStatus("idle");
     setSubmitError(null);
@@ -123,7 +137,7 @@ export function ConsultationForm() {
   };
 
   if (status === "success") {
-    return <SuccessMessage onReset={handleReset} name={form.name} />;
+    return <SuccessMessage onReset={handleReset} name={effectiveName} />;
   }
 
   return (
@@ -147,16 +161,54 @@ export function ConsultationForm() {
 
       <div className="space-y-6 px-6 py-7 sm:px-8 sm:py-8">
 
+        {/* 익명 상담 토글 */}
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold text-slate-700">
+              이름 없이 익명으로 상담하기
+            </p>
+            <p className="mt-0.5 text-[0.75rem] text-slate-400">
+              실명 대신 닉네임으로 신청할 수 있습니다. 회신을 위해 연락처는 필요합니다.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isAnonymous}
+            aria-label="익명으로 상담하기"
+            onClick={() => {
+              setIsAnonymous((v) => !v);
+              setErrors((prev) => ({ ...prev, name: undefined }));
+            }}
+            className={cn(
+              "relative h-6 w-11 shrink-0 rounded-full transition-colors",
+              isAnonymous ? "bg-amber-500" : "bg-slate-300"
+            )}
+          >
+            <span
+              className={cn(
+                "absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
+                isAnonymous && "translate-x-5"
+              )}
+            />
+          </button>
+        </div>
+
         {/* 이름 + 연락처 */}
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="이름" required error={errors.name}>
+          <Field
+            label={isAnonymous ? "닉네임" : "이름"}
+            required={!isAnonymous}
+            error={errors.name}
+            hint={isAnonymous ? "비워두면 '익명'으로 접수됩니다. (선택)" : undefined}
+          >
             <Input
               type="text"
-              placeholder="홍길동"
+              placeholder={isAnonymous ? "예: ㅇㅇ" : "홍길동"}
               value={form.name}
               onChange={(v) => set("name", v)}
               hasError={!!errors.name}
-              autoComplete="name"
+              autoComplete={isAnonymous ? "off" : "name"}
             />
           </Field>
 
@@ -241,25 +293,24 @@ export function ConsultationForm() {
           </div>
         </Field>
 
-        {/* 연락 가능 시간 */}
-        <Field label="연락 가능 시간">
-          <div className="grid grid-cols-2 gap-2">
-            {CONTACT_TIMES.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => set("contactTime", opt.value)}
-                className={cn(
-                  "rounded-xl border px-3 py-2.5 text-sm font-medium transition-all duration-150 active:scale-[0.97]",
-                  form.contactTime === opt.value
-                    ? "border-amber-400 bg-amber-50 text-amber-700 shadow-[0_0_0_2px_rgba(245,158,11,0.15)]"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+        {/* 증거 파일 첨부 (선택) */}
+        <Field
+          label="자료 첨부"
+          hint="대화 캡처·사진·진단서 등을 첨부할 수 있습니다. 비공개로 안전하게 보관됩니다. (선택)"
+        >
+          <AttachmentUploader
+            value={attachments}
+            onChange={setAttachments}
+            disabled={status === "submitting"}
+          />
+        </Field>
+
+        {/* 희망 상담 일시 (예약) */}
+        <Field
+          label="희망 상담 일시"
+          hint="원하시는 날짜·시간을 선택하시면 맞춰 연락드립니다. (선택 · 평일 기준)"
+        >
+          <BookingCalendar value={booking} onChange={setBooking} />
         </Field>
 
         {/* 개인정보 동의 */}
